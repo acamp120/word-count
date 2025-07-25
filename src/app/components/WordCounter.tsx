@@ -17,16 +17,32 @@ export default function WordCounter() {
   const [misspelled, setMisspelled] = useState<string[]>([]);
 
   async function checkSpelling() {
-    const res = await fetch("/api/spellcheck/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ text })
-    });
+    if (cleanText.length > 0) {
+      const res = await fetch("/api/spellcheck/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ text })
+      });
 
-    const data = await res.json();
-    setMisspelled(data.misspelled);
+      const data = await res.json();
+
+      if (data.misspelled.length === 0) {
+        setMisspelled(["No spelling errors!"]);
+      } else {
+        setMisspelled(data.misspelled);
+      }
+    } else {
+      setMisspelled([]);
+    }
+  }
+
+  function clearText() {
+    if (cleanText.length > 0) {
+      setText("");
+      setMisspelled([]);
+    }
   }
 
   return (
@@ -40,14 +56,16 @@ export default function WordCounter() {
         rows={6}
       />
       <button
-        className="w-full mb-4 px-4 py-2 bg-green-500 text-white rounded"
+        className="w-full mb-4 px-4 py-2 bg-green-500 text-white hover:cursor-pointer disabled:bg-gray-300 disabled:text-black disabled:cursor-not-allowed rounded"
         onClick={checkSpelling}
+        disabled={cleanText.length === 0}
       >
         Check Spelling
       </button>
       <button
-        className="w-full mb-4 px-4 py-2 bg-red-500 text-white rounded"
-        onClick={() => setText("")}
+        className="w-full mb-4 px-4 py-2 bg-red-500 text-white disabled:bg-gray-300 hover:cursor-pointer disabled:text-black disabled:cursor-not-allowed rounded"
+        onClick={clearText}
+        disabled={cleanText.length === 0}
       >
         Reset
       </button>

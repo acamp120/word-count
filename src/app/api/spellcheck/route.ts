@@ -7,6 +7,8 @@ let dictionary: Set<string> | null = null;
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+
+    // avoid runtime errors if body is missing or not defined
     const text = body?.text;
 
     if (!text || typeof text !== "string") {
