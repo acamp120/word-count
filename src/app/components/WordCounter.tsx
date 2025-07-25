@@ -15,34 +15,51 @@ export default function WordCounter() {
 
   // spellcheck api
   const [misspelled, setMisspelled] = useState<string[]>([]);
+  const [isChecking, setIsChecking] = useState(false);
   const [checkCompleted, setCheckCompleted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function checkSpelling() {
-    if (cleanText.length > 0) {
-      const res = await fetch("/api/spellcheck/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ text })
-      });
+    setIsChecking(true);
+    setError(null);
 
-      const data = await res.json();
+    try {
+      if (cleanText.length > 0) {
+        const res = await fetch("/api/spellcheck/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ text })
+        });
 
-      if (data.misspelled.length === 0) {
-        setMisspelled([]);
+        if (!res.ok) {
+          throw new Error("Server returned an error");
+        }
+
+        const data = await res.json();
+
+        if (data.misspelled.length === 0) {
+          setMisspelled([]);
+        } else {
+          setMisspelled(data.misspelled);
+        }
+
+        setCheckCompleted(true);
       } else {
-        setMisspelled(data.misspelled);
+        setMisspelled([]);
       }
-    } else {
-      setMisspelled([]);
+    } catch (err) {
+      console.error("Spell check failed:", err);
+      setError("Spell check failed. Please try again.");
+    } finally {
+      setIsChecking(false);
     }
-
-    setCheckCompleted(true);
   }
 
   function clearText() {
     setCheckCompleted(false);
+    setError(null);
 
     if (cleanText.length > 0) {
       setText("");
@@ -63,9 +80,9 @@ export default function WordCounter() {
       <button
         className="w-full mb-4 px-4 py-2 bg-green-500 text-white hover:cursor-pointer disabled:bg-gray-300 disabled:text-black disabled:cursor-not-allowed rounded"
         onClick={checkSpelling}
-        disabled={cleanText.length === 0}
+        disabled={cleanText.length === 0 || isChecking}
       >
-        Check Spelling
+        {isChecking ? "Checking..." : "Check Spelling"}
       </button>
       <button
         className="w-full mb-4 px-4 py-2 bg-red-500 text-white disabled:bg-gray-300 hover:cursor-pointer disabled:text-black disabled:cursor-not-allowed rounded"
@@ -74,6 +91,13 @@ export default function WordCounter() {
       >
         Reset
       </button>
+
+      {error && (
+        <div className="mt-4 mb-4 p-4 border rounded border-red-600 bg-red-100 text-red-800">
+          <p className="font-bold">Error:</p>
+          <p>{error}</p>
+        </div>
+      )}
 
       {checkCompleted && misspelled.length === 0 && (
         <div className="mt-4 mb-4 p-4 border rounded border-green-400 bg-green-200">
