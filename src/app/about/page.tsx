@@ -18,6 +18,9 @@ export default function AboutPage() {
         <li>Reset button to clear the input and reset stats.</li>
         <li>Client-side routing with Next.js <code className="bg-gray-300 px-1">&lt;Link&gt;</code> components for smooth navigation.</li>
         <li>Responsive design powered by Tailwind CSS utility classes.</li>
+        <li>Visual feedback with distinct styles for spellcheck results: a green success message if no errors are found, or a red list of misspelled words.</li>
+        <li>Disable buttons (<code className="bg-gray-300 px-1">Check Spelling</code> and <code className="bg-gray-300 px-1">Reset</code>) when there is no text input to improve UX and prevent unnecessary API calls.</li>
+        <li>Reset button also clears spellcheck results and hides feedback messages.</li>
       </ul>
 
       <h2 className="text-xl font-bold mb-3">Concepts Utilized</h2>
@@ -31,6 +34,12 @@ export default function AboutPage() {
         <li>Handling asynchronous data fetching with <code className="bg-gray-300 px-1">fetch</code> and JSON parsing.</li>
         <li>Basic text processing with regular expressions for cleaning input text.</li>
         <li>Tailwind CSS for utility-first styling and responsive layout.</li>
+        <li>Managing multiple UI states using React’s <code className="bg-gray-300 px-1">useState</code> for handling text input, spellcheck results, and completion status.</li>
+        <li>Separation of concerns by structuring API logic with input validation, caching dictionary data on the server for efficient spellchecking.</li>
+        <li>Error handling and server-side validation in Next.js API routes with appropriate HTTP response codes.</li>
+        <li>Conditional UI rendering based on async results, including handling <code className="bg-gray-300 px-1">no spelling errors</code> scenario distinctly.</li>
+        <li>Accessibility improvements via button disabling and cursor changes on disabled states.</li>
+        <li>Use of TypeScript’s non-null assertion operator (<code className="bg-gray-300 px-1">!</code>) in safe contexts to assure type correctness during dictionary lookups.</li>
       </ul>
     </section>
   );

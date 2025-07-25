@@ -13,8 +13,9 @@ export default function WordCounter() {
   const longestWord = words.reduce((longest, word) => (word.length > longest.length ? word : longest), "");
   const avgWordLength = wordCount === 0 ? 0 : (words.join("").length / wordCount).toFixed(2);
 
-  // mock spellcheck api
+  // spellcheck api
   const [misspelled, setMisspelled] = useState<string[]>([]);
+  const [checkCompleted, setCheckCompleted] = useState(false);
 
   async function checkSpelling() {
     if (cleanText.length > 0) {
@@ -29,16 +30,20 @@ export default function WordCounter() {
       const data = await res.json();
 
       if (data.misspelled.length === 0) {
-        setMisspelled(["No spelling errors!"]);
+        setMisspelled([]);
       } else {
         setMisspelled(data.misspelled);
       }
     } else {
       setMisspelled([]);
     }
+
+    setCheckCompleted(true);
   }
 
   function clearText() {
+    setCheckCompleted(false);
+
     if (cleanText.length > 0) {
       setText("");
       setMisspelled([]);
@@ -70,7 +75,13 @@ export default function WordCounter() {
         Reset
       </button>
 
-      {misspelled.length > 0 && (
+      {checkCompleted && misspelled.length === 0 && (
+        <div className="mt-4 mb-4 p-4 border rounded border-green-400 bg-green-200">
+          <h2 className="text-lg font-bold text-center">No Spelling Errors Found!</h2>
+        </div>
+      )}
+
+      {checkCompleted && misspelled.length > 0 && (
         <div className="mt-4 mb-4 p-4 border rounded border-red-400 bg-red-200">
           <h2 className="text-lg font-bold mb-2">Possible Misspellings:</h2>
           <ul className="list-disc list-inside">
